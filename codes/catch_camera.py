@@ -1,5 +1,4 @@
 import cv2
-import numpy as np
 Vid_cap = cv2.VideoCapture(0) # use webcam to catch image
 Vid_cap.set(3,640)
 Vid_cap.set(4,480)

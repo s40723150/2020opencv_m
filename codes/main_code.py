@@ -13,8 +13,7 @@ def trackbar_set(window_name, bar1_name, bar2_name):
     cv2.resizeWindow(window_name, 640, 560)
     cv2.createTrackbar(bar1_name, window_name, 52, 255, empty)
     cv2.createTrackbar(bar2_name, window_name, 50, 255, empty)
-    bar_name = [bar1_name, bar2_name]
-    return bar_name
+    return bar1_name,bar2_name
 def filter(mode_number):
     GBlur = cv2.GaussianBlur(vid, (7, 7), 0)  # smooth the Vid_Gray
     Gray = cv2.cvtColor(GBlur, cv2.COLOR_BGR2GRAY)  # convert BGR to gray
@@ -27,10 +26,6 @@ def filter(mode_number):
     Outline = frames(vid, Filter)
     cv2.imshow(window_name, Outline)
     return Outline
-def save_img(path, img_name,img_type,  i):
-    set_path = str(path+img_name+str(i)+"."+img_type)
-    cv2.imwrite(set_path, filter(3))
-    print(set_path, i)
 def frames(vid, Filter):
     thresh, mask = cv2.threshold(Filter, 240, 255, cv2.THRESH_BINARY)
     # Use Vid_Canny to make mask
@@ -38,6 +33,11 @@ def frames(vid, Filter):
     F_bgr = cv2.cvtColor(F_mask, cv2.COLOR_GRAY2BGR)
     Outline = cv2.add(vid, F_bgr)  # mix video with filter
     return Outline
+def save_img(path, img_name,img_type,  i):
+    set_path = str(path+img_name+str(i)+"."+img_type)
+    cv2.imwrite(set_path, filter(3))
+    print(set_path, i)
+'''
 def recorder_avi(file_name, framerate):
     if file_name == None:
         file_name = "out.avi"
@@ -55,7 +55,7 @@ def recorder_avi(file_name, framerate):
     # VideoOutPut = cv2.VideoWriter(filename, codec, framerate, resolution)
     output_movie = cv2.VideoWriter(file_name, fourcc, framerate, resolution)
     return output_movie
-'''
+
 def rec():
     while key == ord('r'):
         recorder = recorder_avi("out.avi", 29)
@@ -71,10 +71,10 @@ def rec():
 '''
 
 trackbar = trackbar_set(window_name, "Canny 1", "Canny 2")
+save_path = "./../picture/"
 i = 0
 while True:
     get, vid = Vid_cap.read()
-
     rows, cols, channels = vid.shape
     F_place = vid[0:rows, 0:cols]
     c_1 = cv2.getTrackbarPos(trackbar[0], window_name)
@@ -87,11 +87,9 @@ while True:
         break
     elif key == ord("r"):
         i = i + 1
-        save_img("./../picture/","picture","png",i)
-        '''
-        cv2.imwrite("picture"+str(i)+".png", filter(3))
-        print("picture"+str(i)+".png",i)
-        '''
+        save_img(save_path,"picture","png",i)
         continue
     else:
         pass
+Vid_cap.release()
+cv2.destroyAllWindows()

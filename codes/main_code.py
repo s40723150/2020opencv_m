@@ -19,9 +19,25 @@ def filter(mode_number):
     GBlur = cv2.GaussianBlur(vid, (7, 7), 0)  # smooth the Vid_Gray
     Gray = cv2.cvtColor(GBlur, cv2.COLOR_BGR2GRAY)  # convert BGR to gray
     Canny = cv2.Canny(Gray, c_1, c_2)  # find edges
+
     filter_list = [GBlur, Gray, Canny]
     mode_number = -1
-    return filter_list[mode_number]
+
+    Filter = filter_list[mode_number]
+    Outline = frames(vid, Filter)
+    cv2.imshow(window_name, Outline)
+    return Outline
+def save_img(path, img_name,img_type,  i):
+    set_path = str(path+img_name+str(i)+"."+img_type)
+    cv2.imwrite(set_path, filter(3))
+    print(set_path, i)
+def frames(vid, Filter):
+    thresh, mask = cv2.threshold(Filter, 240, 255, cv2.THRESH_BINARY)
+    # Use Vid_Canny to make mask
+    F_mask = cv2.bitwise_and(Filter, Filter, mask=mask)
+    F_bgr = cv2.cvtColor(F_mask, cv2.COLOR_GRAY2BGR)
+    Outline = cv2.add(vid, F_bgr)  # mix video with filter
+    return Outline
 def recorder_avi(file_name, framerate):
     if file_name == None:
         file_name = "out.avi"
@@ -39,13 +55,6 @@ def recorder_avi(file_name, framerate):
     # VideoOutPut = cv2.VideoWriter(filename, codec, framerate, resolution)
     output_movie = cv2.VideoWriter(file_name, fourcc, framerate, resolution)
     return output_movie
-def frames(vid, Filter):
-    thresh, mask = cv2.threshold(Filter, 240, 255, cv2.THRESH_BINARY)
-    # Use Vid_Canny to make mask
-    F_mask = cv2.bitwise_and(Filter, Filter, mask=mask)
-    F_bgr = cv2.cvtColor(F_mask, cv2.COLOR_GRAY2BGR)
-    Outline = cv2.add(vid, F_bgr)  # mix video with filter
-    return Outline
 '''
 def rec():
     while key == ord('r'):
@@ -62,7 +71,7 @@ def rec():
 '''
 
 trackbar = trackbar_set(window_name, "Canny 1", "Canny 2")
-
+i = 0
 while True:
     get, vid = Vid_cap.read()
 
@@ -72,12 +81,17 @@ while True:
     c_2 = cv2.getTrackbarPos(trackbar[1], window_name)
 
     filter(3)
-    Filter = filter(3)
-    Outline = frames(vid, Filter)
-    cv2.imshow(window_name, Outline)
-
     key = cv2.waitKey(10) & 0XFF
     esc = 27
-
     if key == esc:
         break
+    elif key == ord("r"):
+        i = i + 1
+        save_img("./../picture/","picture","png",i)
+        '''
+        cv2.imwrite("picture"+str(i)+".png", filter(3))
+        print("picture"+str(i)+".png",i)
+        '''
+        continue
+    else:
+        pass

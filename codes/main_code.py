@@ -33,28 +33,32 @@ def filter(mode_number):
     filter_list2 = ["Origin", "GBlur", "Gray", "Canny", "Sobel"]
 
     Filter = filter_list1[mode_number]
-    if mode_number >= 3:
-        Outline = frames(vid, Filter, mode_number)
+    if mode_number == 3:
+        Outline = mask_canny(vid, Filter, mode_number)
+        cv2.imshow(window_name, Outline)
+    elif mode_number == 4:
+        Outline = mask_sobel(vid, Filter, mode_number)
         cv2.imshow(window_name, Outline)
     else:
         Outline = Filter
         cv2.imshow(window_name, Outline)
     return Outline, filter_list2[mode_number]
-def frames(vid, Filter, mode_number):
-    if mode_number == 2:
-        thresh, mask = cv2.threshold(Filter, 240, 255, cv2.THRESH_BINARY)
-        # Use Vid_Canny to make mask
-        F_mask = cv2.bitwise_and(Filter, Filter, mask=mask)
-        F_bgr = cv2.cvtColor(F_mask, cv2.COLOR_GRAY2BGR)
-        Outline = cv2.add(vid, F_bgr)  # mix video with filter
+def mask_canny(vid, Filter, mode_number):
+    thresh, mask = cv2.threshold(Filter, 240, 255, cv2.THRESH_BINARY)
+    # Use Vid_Canny to make mask
+    F_mask = cv2.bitwise_and(Filter, Filter, mask=mask)
+    F_bgr = cv2.cvtColor(F_mask, cv2.COLOR_GRAY2BGR)
+    Outline = cv2.add(vid, F_bgr)  # mix video with filter
+    if mode_number == 3:
         return Outline
-    else:
+def mask_sobel(vid, Filter, mode_number):
         thresh, mask = cv2.threshold(Filter, 50, 255, cv2.THRESH_BINARY)
         # Use Vid_Canny to make mask
         F_mask = cv2.bitwise_and(Filter, Filter, mask=mask)
         F_bgr = cv2.cvtColor(F_mask, cv2.COLOR_GRAY2BGR)
         Outline = cv2.add(vid, F_bgr)  # mix video with filter
-        return Outline
+        if mode_number == 4:
+            return Outline
 
 def save_img(path, img_name,img_type,filter_number, i):
     set_path = str(path+str(i)+"_"+filter(filter_number)[1]+"_"+img_name+"."+img_type)

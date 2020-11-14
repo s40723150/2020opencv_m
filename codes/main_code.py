@@ -23,18 +23,17 @@ def filter(mode_number):
 
     Gray = cv2.cvtColor(vid, cv2.COLOR_BGRA2GRAY)
 
-    sobelX = cv2.Sobel(Gray, cv2.CV_64F, 1, 0)
-    sobelY = cv2.Sobel(Gray, cv2.CV_64F, 0, 1)
-
-    sobelX = np.uint8(np.absolute(sobelX))
-    sobelY = np.uint8(np.absolute(sobelY))
-    Sobel = cv2.bitwise_or(sobelX, sobelY)
+    sobel_x = cv2.Sobel(Gray, cv2.CV_64F, 1, 0)  # 利用捲積的方式描取X方向輪廓。
+    sobel_y = cv2.Sobel(Gray, cv2.CV_64F, 0, 1)  # 利用捲積的方式描取Y方向輪廓。
+    sobelx = np.uint8(np.absolute(sobel_x))  # 將sobel_x影像矩陣的數值加上絕對值。
+    sobely = np.uint8(np.absolute(sobel_y))  # 將sobel_y影像矩陣的數值加上絕對值。
+    Sobel = cv2.bitwise_or(sobelx, sobely)  # 聯集X方向和Y方向所取得的輪廓。
 
     filter_list1 = [Origin, GBlur, Gray, Canny, Sobel]
     filter_list2 = ["Origin", "GBlur", "Gray", "Canny", "Sobel"]
 
     Filter = filter_list1[mode_number]
-    if mode_number >= 2:
+    if mode_number >= 3:
         Outline = frames(vid, Filter, mode_number)
         cv2.imshow(window_name, Outline)
     else:
@@ -58,42 +57,9 @@ def frames(vid, Filter, mode_number):
         return Outline
 
 def save_img(path, img_name,img_type,filter_number, i):
-    set_path = str(path+filter(filter_number)[1]+"_"+img_name+str(i)+"."+img_type)
+    set_path = str(path+str(i)+"_"+filter(filter_number)[1]+"_"+img_name+"."+img_type)
     cv2.imwrite(set_path, filter(filter_number)[0])
     print(set_path, i)
-'''
-def recorder_avi(file_name, framerate):
-    if file_name == None:
-        file_name = "out.avi"
-    elif framerate == None:
-        framerate = 29
-    else:
-        print(file_name, framerate)
-        pass
-
-    # fourcc = cv2.VideoWriter_fourcc('M', 'P', '4', 'V')
-    fourcc = cv2.VideoWriter_fourcc('X', 'V', 'I', 'D')
-    resolution = (vid.shape[1], vid.shape[0])  # (640, 480)
-    print(resolution)
-
-    # VideoOutPut = cv2.VideoWriter(filename, codec, framerate, resolution)
-    output_movie = cv2.VideoWriter(file_name, fourcc, framerate, resolution)
-    return output_movie
-
-def rec():
-    while key == ord('r'):
-        recorder = recorder_avi("out.avi", 29)
-        frames(vid, Filter)
-        recorder.write(Outline)
-        if key == ord('s'):
-            recorder.release()
-            break
-        elif key == esc:
-            break
-        else:
-            pass
-'''
-
 trackbar = trackbar_set(window_name, "Canny 1", "Canny 2", "FilterMode")
 save_path = "./../picture/"
 i = 0

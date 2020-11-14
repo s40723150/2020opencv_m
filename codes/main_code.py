@@ -13,9 +13,10 @@ def trackbar_set(window_name, bar1_name, bar2_name, bar3_name):
     cv2.resizeWindow(window_name, 640, 600)
     cv2.createTrackbar(bar1_name, window_name, 52, 255, empty)
     cv2.createTrackbar(bar2_name, window_name, 50, 255, empty)
-    cv2.createTrackbar(bar3_name, window_name, 3, 3, empty)
+    cv2.createTrackbar(bar3_name, window_name, 4, 4, empty)
     return bar1_name,bar2_name, bar3_name
 def filter(mode_number):
+    Origin = vid
     GBlur = cv2.GaussianBlur(vid, (7, 7), 0)  # smooth the Vid_Gray
     B_Gray = cv2.cvtColor(GBlur, cv2.COLOR_BGR2GRAY)  # convert BGR to gray
     Canny = cv2.Canny(B_Gray, c_1, c_2)  # find edges
@@ -29,8 +30,8 @@ def filter(mode_number):
     sobelY = np.uint8(np.absolute(sobelY))
     Sobel = cv2.bitwise_or(sobelX, sobelY)
 
-    filter_list1 = [GBlur, Gray, Canny, Sobel]
-    filter_list2 = ["GBlur", "Gray", "Canny", "Sobel"]
+    filter_list1 = [Origin, GBlur, Gray, Canny, Sobel]
+    filter_list2 = ["Origin", "GBlur", "Gray", "Canny", "Sobel"]
 
     Filter = filter_list1[mode_number]
     if mode_number >= 2:
@@ -57,7 +58,7 @@ def frames(vid, Filter, mode_number):
         return Outline
 
 def save_img(path, img_name,img_type,filter_number, i):
-    set_path = str(path+filter(filter_number)[1]+img_name+str(i)+"."+img_type)
+    set_path = str(path+filter(filter_number)[1]+"_"+img_name+str(i)+"."+img_type)
     cv2.imwrite(set_path, filter(filter_number)[0])
     print(set_path, i)
 '''

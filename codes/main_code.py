@@ -8,13 +8,14 @@ window_name = "outline_filter"
 
 def empty(a):
     pass
-def trackbar_set(window_name, bar1_name, bar2_name, bar3_name):
+def trackbar_set(window_name, bar1_name, bar2_name, bar3_name, bar4_name):
     cv2.namedWindow(window_name)
-    cv2.resizeWindow(window_name, 640, 600)
+    #cv2.resizeWindow(window_name, 640, 160)
     cv2.createTrackbar(bar1_name, window_name, 52, 255, empty)
     cv2.createTrackbar(bar2_name, window_name, 50, 255, empty)
-    cv2.createTrackbar(bar3_name, window_name, 4, 4, empty)
-    return bar1_name,bar2_name, bar3_name
+    cv2.createTrackbar(bar3_name, window_name, 50, 255, empty)
+    cv2.createTrackbar(bar4_name, window_name, 4, 4, empty)
+    return bar1_name,bar2_name, bar3_name, bar4_name
 def filter(mode_number):
     Origin = vid
     GBlur = cv2.GaussianBlur(vid, (7, 7), 0)  # smooth the Vid_Gray
@@ -52,7 +53,7 @@ def mask_canny(vid, Filter, mode_number):
     if mode_number == 3:
         return Outline
 def mask_sobel(vid, Filter, mode_number):
-        thresh, mask = cv2.threshold(Filter, 50, 255, cv2.THRESH_BINARY)
+        thresh, mask = cv2.threshold(Filter, s_1, 255, cv2.THRESH_BINARY)
         # Use Vid_Canny to make mask
         F_mask = cv2.bitwise_and(Filter, Filter, mask=mask)
         F_bgr = cv2.cvtColor(F_mask, cv2.COLOR_GRAY2BGR)
@@ -64,7 +65,7 @@ def save_img(path, img_name,img_type,filter_number, i):
     set_path = str(path+str(i)+"_"+filter(filter_number)[1]+"_"+img_name+"."+img_type)
     cv2.imwrite(set_path, filter(filter_number)[0])
     print(set_path, i)
-trackbar = trackbar_set(window_name, "Canny 1", "Canny 2", "FilterMode")
+trackbar = trackbar_set(window_name, "Canny 1", "Canny 2", "Sobel", "FilterMode")
 save_path = "./../picture/"
 i = 0
 while True:
@@ -73,7 +74,8 @@ while True:
     F_place = vid[0:rows, 0:cols]
     c_1 = cv2.getTrackbarPos(trackbar[0], window_name)
     c_2 = cv2.getTrackbarPos(trackbar[1], window_name)
-    filter_number = cv2.getTrackbarPos(trackbar[2], window_name)
+    s_1 = cv2.getTrackbarPos(trackbar[2], window_name)
+    filter_number = cv2.getTrackbarPos(trackbar[3], window_name)
     filter(filter_number)
     key = cv2.waitKey(10) & 0XFF
     esc = 27
